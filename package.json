@@ -5,9 +5,13 @@
   "author": "Dave Coates",
   "license": "MIT",
   "dependencies": {
+    "promised-neovim-client": "^2.0.2",
     "xstream": "^6.4.1"
   },
   "devDependencies": {
+    "@types/es6-shim": "^0.31.32",
+    "@types/jest": "^15.1.32",
+    "@types/node": "^6.0.45",
     "jest": "^16.0.1",
     "ts-jest": "^0.1.7"
   },

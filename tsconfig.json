@@ -1,9 +1,10 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es5",
+        "target": "es6",
+        "outDir": "dist",
+        "rootDir": "src",
         "noImplicitAny": false,
         "sourceMap": false
-    },
-    "files": [ "typings/tsd.d.ts" ]
+    }
 }
