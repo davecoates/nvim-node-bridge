@@ -1,0 +1,26 @@
+{
+  "name": "nvim-node-bridge",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Dave Coates",
+  "license": "MIT",
+  "dependencies": {
+    "xstream": "^6.4.1"
+  },
+  "devDependencies": {
+    "jest": "^16.0.1",
+    "ts-jest": "^0.1.7"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/ts-jest/preprocessor.js",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ]
+  }
+}
