@@ -3,37 +3,36 @@ import { Nvim } from 'neovim-client/promise';
 import Screen, { Point } from './screen';
 import { Observable } from 'rxjs/Rx';
 
+
+async function fetchAndSyncWindows(nvim) {
+    // Pause redraw stream so any processing of that is delayed until after
+    // window sync is completed
+    //await nvim.command('windo call setwinvar(winnr(), "number", winnr())');
+    const windows = await nvim.getWindows();
+    // Didn't seem to be anyway to get the window number
+    // directly from the window provided by the neovim client.
+    // Read window var to track this for each window. See vim-helpers.vim
+    // for where this is originally set.
+    const details = new Map();
+    for (const win of windows) {
+        const [row, column] = await win.getPosition();
+        const position = new Point(row, column);
+        const height = await win.getHeight();
+        const width = await win.getWidth();
+        const windowId = await win.getVar('nvim_window_name');
+        const buffer = await win.getBuffer();
+        const bufferNumber = await buffer.getNumber();
+        const lineNumbersEnabled = await win.getOption('nu');
+        details.set(windowId, ({ lineNumbersEnabled, bufferNumber, windowId, position, width, height }));
+    }
+    return details;
+}
+
+
 export default class WindowManager {
 
     screen: Screen;
     nvim: Nvim;
-
-    fetchAndSyncWindows = async () => {
-        // Pause redraw stream so any processing of that is delayed until after
-        // window sync is completed
-        await this.nvim.command('windo call setwinvar(winnr(), "number", winnr())');
-        const windows = await this.nvim.getWindows();
-        // Didn't seem to be anyway to get the window number
-        // directly from the window provided by the neovim client.
-        // Read window var to track this for each window. See vim-helpers.vim
-        // for where this is originally set.
-        const details = new Map();
-        for (const win of windows) {
-            const [row, column] = await win.getPosition();
-            const position = new Point(row, column);
-            const height = await win.getHeight();
-            const width = await win.getWidth();
-            const windowId = await win.getVar('nvim_window_name');
-            const buffer = await win.getBuffer();
-            const bufferNumber = await buffer.getNumber();
-            const lineNumbersEnabled = await win.getOption('nu');
-            console.log('GET WINDOW', lineNumbersEnabled);
-            details.set(windowId, ({ lineNumbersEnabled, bufferNumber, windowId, position, width, height }));
-        }
-        //this.syncWindows([...details.values()]);
-        console.log('WINCREATE END', details);
-        //this.redrawFinishStream.resume();
-    }
 
     constructor(nvim: Nvim, screen: Screen, vimEvents: EventEmitter) {
         this.screen = screen;
@@ -49,7 +48,11 @@ export default class WindowManager {
         bufEnter$.subscribe(async (details) => {
             console.log('last buf enter', details);
         });
-        winCreated$.debounce(() => Observable.timer(500)).subscribe(this.fetchAndSyncWindows);
+        winCreated$.debounce(() => Observable.timer(500)).subscribe(async () => {
+            vimEvents.emit('windowSyncStart');
+            const windows = await fetchAndSyncWindows(this.nvim);
+            vimEvents.emit('windowSyncFinish', windows);
+        });
         // ...but pause the redraw stream immediately as we need to delay that
         // until windows have been sync'd
         winCreated$.subscribe(() => {

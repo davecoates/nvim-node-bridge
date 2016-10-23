@@ -82,6 +82,16 @@ export default class Bridge {
             console.log(method, args, resp)
             // handle msgpack-rpc request
         });
+
+        this.emitter.on('windowSyncStart', () => {
+            // pause redraw
+            console.log('windowSyncStart!!');
+        });
+        this.emitter.on('windowSyncFinish', () => {
+            // unpause redraw
+            console.log('windowSyncFinish!!');
+        });
+
         this.windowManager = new WindowManager(nvim, this.screen, this.emitter);
     }
 
