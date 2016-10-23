@@ -5,8 +5,9 @@
   "author": "Dave Coates",
   "license": "MIT",
   "dependencies": {
+    "neovim-client": "^2.1.0",
     "promised-neovim-client": "^2.0.2",
-    "xstream": "^6.4.1"
+    "rxjs": "^5.0.0-rc.1"
   },
   "devDependencies": {
     "@types/es6-shim": "^0.31.32",

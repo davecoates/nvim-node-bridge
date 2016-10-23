@@ -1,4 +1,4 @@
-import { attach } from 'promised-neovim-client';
+import attach from 'neovim-client/promise';
 import { spawn, ChildProcess } from 'child_process';
 import Bridge, { WindowConfigOptions } from './bridge';
 import * as net from 'net';
